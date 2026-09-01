@@ -375,7 +375,10 @@
     // height so the grid stays aligned.
     function fitLabel(el) {
         el.style.fontSize = '';
-        shrinkToFit(el);
+        // Lower floor than the shared default — narrow mobile cells (see
+        // the about-grid mobile media query) leave long topics like
+        // "Favorite Game of all Time" still clipped at 6px otherwise.
+        shrinkToFit(el, 4.5);
     }
 
     function fitLabels() {
