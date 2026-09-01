@@ -3661,6 +3661,13 @@ input.aspect-input[type="number"]:focus {
            the bottom, whichever is taller. */
         height: auto;
         min-height: 100vh;
+        /* The base rule's overflow:hidden assumes the fixed-viewport
+           desktop layout, where internal panes (.view--scroll etc.)
+           handle their own scrolling instead. That assumption doesn't
+           hold here — nothing below overrides it back, so the page
+           silently couldn't scroll at all despite growing past the
+           viewport. */
+        overflow: visible;
     }
 
     .app {
