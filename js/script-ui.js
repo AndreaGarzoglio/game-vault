@@ -377,6 +377,15 @@
         buttons.forEach((btn) => btn.classList.toggle('is-active', btn.dataset.appView === name));
         REFRESH_HOOKS[name]?.();
 
+        // Below 980px the page normally grows to fit its content and the
+        // whole document scrolls — fine for library/about/tops, but the
+        // tier maker's tray (drag source for placing games) needs to stay
+        // pinned at the bottom of the screen like on desktop instead of
+        // scrolling 10000px away with the tier rows. This class re-bounds
+        // the layout to the viewport height only while tiers is active
+        // (see the mobile media query in style.css).
+        document.documentElement.classList.toggle('is-tier-view', name === 'tiers');
+
         // The hidden view's background zones freeze in place while it's
         // hidden (see script-enhancements.js); resync whichever one just
         // became visible so it doesn't show stale glow from before the switch.

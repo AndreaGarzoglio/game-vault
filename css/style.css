@@ -3768,6 +3768,34 @@ input.aspect-input[type="number"]:focus {
     .view--scroll {
         overflow: visible;
     }
+
+    /* ---- Tier maker: keep the desktop split behavior on mobile too ----
+       Everything above lets the page grow past the viewport so it can
+       all be scrolled normally — but the tier maker's tray needs to stay
+       reachable at the bottom of the screen while dragging, not pushed
+       thousands of pixels down past every tier row. When tiers is the
+       active view (see the .is-tier-view toggle in script-ui.js), this
+       re-establishes the bounded, internally-scrolling layout the
+       desktop styles already rely on, so only .tier-scroll scrolls and
+       .tray stays pinned below it. */
+    html.is-tier-view,
+    html.is-tier-view body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    html.is-tier-view .app {
+        grid-template-rows: auto 1fr;
+        height: 100%;
+    }
+
+    html.is-tier-view .main {
+        min-height: 0;
+    }
+
+    html.is-tier-view .view--split {
+        overflow: hidden;
+    }
 }
 
 @media (max-width: 620px) {
@@ -3795,6 +3823,12 @@ input.aspect-input[type="number"]:focus {
 
     .tier {
         grid-template-columns: 56px 1fr 26px;
+    }
+
+    /* Narrower cards fit 3 per row instead of 2 — same games, shorter
+       (fewer, longer) rows instead of a tall stack. */
+    .tier-item {
+        width: 58px;
     }
 
     .tier__label {
@@ -3881,6 +3915,12 @@ input.aspect-input[type="number"]:focus {
         font-size: 8px;
     }
 
+    /* ---- Narrower about-me cells: 2 per row instead of 1 ---- */
+    .about-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: var(--s3);
+    }
+
     /* ---- Compact top-list rows ---- */
     .top-rows {
         gap: 36px;
@@ -3908,6 +3948,13 @@ input.aspect-input[type="number"]:focus {
     .top-row__rank {
         right: var(--s3);
         font-size: 24px;
+    }
+
+    /* Title + rank only — the note has no room to breathe next to a
+       tilted cover at this width and was forcing the title into a
+       column-width sliver, wrapping it letter by letter. */
+    .top-row__note {
+        display: none;
     }
 }
 
