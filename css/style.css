@@ -3690,8 +3690,8 @@ input.aspect-input[type="number"]:focus {
     }
 
     .mobile-topbar__logo {
-        width: 24px;
-        height: 24px;
+        width: 40px;
+        height: 40px;
         image-rendering: pixelated;
     }
 
