@@ -37,7 +37,7 @@
     // Wraps `innerNode` (built from the same markup functions the live
     // view uses) in a branded poster frame, renders it off-screen, and
     // downloads the result as `filename`.
-    window.exportNodeAsPoster = async function ({ innerNode, width, title, subtitle, filename }) {
+    window.exportNodeAsPoster = async function ({ innerNode, width, title, subtitle, filename, onMount }) {
         if (typeof html2canvas !== 'function') {
             window.toast('Export isn’t available right now — try reloading the page');
             return;
@@ -68,6 +68,10 @@
         document.body.appendChild(host);
 
         try {
+            // Callers that need real layout (e.g. shrinking a label to fit
+            // its box, which requires scrollWidth/clientWidth) can only do
+            // it now — the node has no size at all before this point.
+            onMount?.();
             await document.fonts.ready;
             const canvas = await html2canvas(poster, {
                 backgroundColor: '#05040c',

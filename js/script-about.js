@@ -593,7 +593,10 @@
             width: 900,
             title: board().name || 'About me',
             subtitle: 'Game Vault · About me',
-            filename: `${board().name || 'about-me'}.png`
+            filename: `${board().name || 'about-me'}.png`,
+            // Same shrink-to-fit the live grid uses — this markup is built
+            // fresh off-screen and never goes through render()/fitLabels().
+            onMount: () => gridEl.querySelectorAll('.about-cell__label-text').forEach(fitLabel)
         });
     }
 
