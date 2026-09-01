@@ -378,45 +378,51 @@
         }
     }
 
-    const titleField = document.getElementById('showName');
-    titleField?.addEventListener('blur', () => {
-        autofillFromIgdb(titleField.value.trim());
-    });
-
-    // ---- Title autocomplete: type-ahead IGDB matches in a dropdown,
-    // picking one fills the whole form straight from that result instead
-    // of waiting on a second lookup once the field loses focus. ----
-    const suggestBox = document.getElementById('showNameSuggest');
-
-    function fillFromRichCard(ref) {
-        lastFetched = {
-            ...lastFetched,
-            image: ref.image || null,
-            genre: (ref.genresList || []).join(', ') || null,
-            screenshot: ref.screenshot || null
-        };
-
-        const yearField = document.getElementById('showYear');
-        const genreField = document.getElementById('showGenre');
-        const descriptionField = document.getElementById('showDescription');
-        const imageField = document.getElementById('showImg');
-        const statusEl = document.getElementById('wikiStatus');
-
-        titleField.value = ref.title;
-        if (yearField && ref.year) yearField.value = ref.year;
-        if (genreField && lastFetched.genre) genreField.value = lastFetched.genre;
-        if (descriptionField && ref.description) descriptionField.value = ref.description;
-        if (imageField && ref.image) imageField.value = ref.image;
-        if (statusEl) statusEl.textContent = 'Found it — feel free to edit the fields.';
-    }
-
-    if (titleField && suggestBox && typeof window.pickGameSingle === 'function') {
-        window.pickGameSingle({
-            inputEl: titleField,
-            resultsEl: suggestBox,
-            includeLibrary: false,
-            renderHint: (ref) => ref.year || '',
-            onPick: fillFromRichCard
+    // The Add-game form is built by script.js's createDialog call, which
+    // loads after this file — #showName doesn't exist in the DOM yet at
+    // this script's top-level eval time, so wiring it up has to wait for
+    // an explicit call once that dialog exists, instead of running here.
+    window.initAddGameAutofill = function () {
+        const titleField = document.getElementById('showName');
+        titleField?.addEventListener('blur', () => {
+            autofillFromIgdb(titleField.value.trim());
         });
-    }
+
+        // ---- Title autocomplete: type-ahead IGDB matches in a dropdown,
+        // picking one fills the whole form straight from that result instead
+        // of waiting on a second lookup once the field loses focus. ----
+        const suggestBox = document.getElementById('showNameSuggest');
+
+        function fillFromRichCard(ref) {
+            lastFetched = {
+                ...lastFetched,
+                image: ref.image || null,
+                genre: (ref.genresList || []).join(', ') || null,
+                screenshot: ref.screenshot || null
+            };
+
+            const yearField = document.getElementById('showYear');
+            const genreField = document.getElementById('showGenre');
+            const descriptionField = document.getElementById('showDescription');
+            const imageField = document.getElementById('showImg');
+            const statusEl = document.getElementById('wikiStatus');
+
+            titleField.value = ref.title;
+            if (yearField && ref.year) yearField.value = ref.year;
+            if (genreField && lastFetched.genre) genreField.value = lastFetched.genre;
+            if (descriptionField && ref.description) descriptionField.value = ref.description;
+            if (imageField && ref.image) imageField.value = ref.image;
+            if (statusEl) statusEl.textContent = 'Found it — feel free to edit the fields.';
+        }
+
+        if (titleField && suggestBox && typeof window.pickGameSingle === 'function') {
+            window.pickGameSingle({
+                inputEl: titleField,
+                resultsEl: suggestBox,
+                includeLibrary: false,
+                renderHint: (ref) => ref.year || '',
+                onPick: fillFromRichCard
+            });
+        }
+    };
 })();

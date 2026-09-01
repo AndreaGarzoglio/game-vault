@@ -194,6 +194,11 @@ const formFields = {
     image: addGameDialog.el.querySelector('#showImg')
 };
 
+// script-wiki.js loads before this file, so #showName doesn't exist yet
+// at its own top-level eval time — it exposes this instead of wiring
+// the field up itself.
+window.initAddGameAutofill?.();
+
 // Colour is picked from swatches rather than a <select>: the value lives
 // in a hidden input so getAdvancedFormData keeps reading `.value`.
 const swatchRow = addGameDialog.el.querySelector('[data-swatch-for="showColor"]');
