@@ -1,0 +1,9 @@
+{
+  "name": "game-vault",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A pixel-art game watchlist and rating app.",
+  "scripts": {
+    "start": "node --env-file=.env server.js"
+  }
+}

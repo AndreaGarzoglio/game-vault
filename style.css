@@ -1,4 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@500;700&display=swap');
+
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root {
+    --bg: #0b0a16;
+    --bg-deep: #05040c;
+    --panel: #1a1530;
+    --panel-2: #241d40;
+    --panel-glass: rgba(26, 21, 48, 0.28);
+    --border: #4c3a82;
+    --border-soft: rgba(139, 92, 246, 0.22);
+    --text-primary: #e9e4ff;
+    --text-secondary: #c3b9e0;
+    --text-dim: #9a8fc0;
+    --accent: #a855f7;
+    --accent-strong: #c084fc;
+    --accent-hover: #9333ea;
+    --cyan: #22d3ee;
+    --gold: #fbbf24;
+    --green: #10b981;
+    --amber: #d97706;
+    --danger: #ef4444;
+    --danger-strong: #f87171;
+
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-term: 'VT323', monospace;
+    --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+
+    --s1: 4px;
+    --s2: 8px;
+    --s3: 12px;
+    --s4: 16px;
+    --s5: 24px;
+    --s6: 32px;
+
+    --ring: 0 0 0 3px rgba(168, 85, 247, 0.4);
+    --shadow-lift: 0 18px 40px -18px rgba(0, 0, 0, 0.9);
+    --ease: cubic-bezier(0.2, 0.8, 0.3, 1);
+}
 
 * {
     margin: 0;
@@ -6,139 +46,1291 @@
     box-sizing: border-box;
 }
 
-:root {
-    --bg-dark: #0c1021;
-    --bg-card: #0f172a;
-    --bg-modal: #0b1220;
-    --bg-surface: #101827;
-    --text-primary: #e6e7eb;
-    --text-secondary: #9da3b5;
-    --accent-purple: #a855f7;
-    --accent-violet: #8b5cf6;
-    --accent-red: #ef4444;
-    --accent-pink: #ec4899;
-    --hover-purple: #9333ea;
-    --hover-violet: #7c3aed;
-    --hover-red: #dc2626;
+[hidden] {
+    display: none !important;
+}
+
+.icon-sprite {
+    display: none;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
 }
 
 body {
-    min-height: 100vh;
-    background: radial-gradient(1200px at 20% 15%, rgba(168, 85, 247, 0.16), transparent 55%),
-        radial-gradient(900px at 80% 0%, rgba(34, 211, 238, 0.14), transparent 50%),
-        linear-gradient(180deg, #0d1326 0%, #0a0f1f 50%, #050712 100%);
-    font-family: 'Space Grotesk', 'Inter', 'Segoe UI', system-ui, sans-serif;
-    padding: 28px;
+    background:
+        radial-gradient(760px 420px at 50% 0%, rgba(139, 92, 246, 0.2), transparent 60%),
+        linear-gradient(180deg, #100c22 0%, #0b0a16 45%, var(--bg-deep) 100%);
+    font-family: var(--font-term);
+    font-size: 18px;
     color: var(--text-primary);
-    letter-spacing: 0.01em;
+    padding: var(--s5);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-#header {
-    margin-bottom: 30px;
+#pixelBg {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
 }
 
-#header h1 {
-    color: var(--text-primary);
-    background: linear-gradient(120deg, #a855f7 0%, #ec4899 50%, #8b5cf6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-size: 56px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-    text-align: center;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.4));
-    line-height: 1.2;
+/* Scrollbars styled to match the UI instead of the OS default. */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
 }
 
-.menu {
-    margin-bottom: 20px;
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border: 3px solid transparent;
+    background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+    background-clip: content-box;
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent-strong);
+    outline-offset: 2px;
+}
+
+.icon {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    display: block;
+}
+
+/* ============================================================
+   NOTCHED SHAPES
+   The house shape is an octagon with cut corners. A CSS `border`
+   can't follow a clip-path through the cut, so a *bordered* notch is
+   built as two stacked shapes: the outer element is the border colour
+   and the inner one is inset by the border width with a proportionally
+   smaller cut. Pure CSS, so unlike a measured SVG polygon it survives
+   any resize or reflow for free.
+   ============================================================ */
+.notch,
+.notch-frame,
+.btn-notch,
+.popover,
+.tag-suggest,
+.select,
+.search input,
+.nav__item {
+    clip-path: polygon(var(--n) 0, calc(100% - var(--n)) 0,
+            100% var(--n), 100% calc(100% - var(--n)),
+            calc(100% - var(--n)) 100%, var(--n) 100%,
+            0 calc(100% - var(--n)), 0 var(--n));
+}
+
+.notch {
+    --n: 10px;
+}
+
+.notch-frame {
+    --n: 12px;
+    --bw: 3px;
+    padding: var(--bw);
+    background: var(--frame, var(--card-accent, var(--accent)));
+}
+
+.notch-inner,
+.btn-notch__inner {
+    /* The cut corner is a 45° diagonal, so offsetting it inward by --bw
+       (like the straight edges) only thickens it by --bw / sqrt(2), and
+       a diagonal edge picks up anti-aliasing softening a straight edge
+       never does — even at equal geometric width it reads as thinner.
+       0.4 overshoots the 2 - sqrt(2) (~0.586) value that would only
+       equalize the raw geometry, to compensate for that softening. */
+    --ni: calc(var(--n) - var(--bw) * 0.4);
+    clip-path: polygon(var(--ni) 0, calc(100% - var(--ni)) 0,
+            100% var(--ni), 100% calc(100% - var(--ni)),
+            calc(100% - var(--ni)) 100%, var(--ni) 100%,
+            0 calc(100% - var(--ni)), 0 var(--ni));
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-notch {
+    --n: 7px;
+    --bw: 2px;
+    padding: var(--bw);
+    background: var(--btn-stroke, var(--border));
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    transition: transform 0.1s var(--ease), background-color 0.15s var(--ease);
+}
+
+.btn-notch__inner {
     display: flex;
+    align-items: center;
     justify-content: center;
+    gap: var(--s2);
+    padding: 11px 16px;
+    background: var(--btn-fill, var(--panel-2));
+    color: var(--btn-text, var(--text-primary));
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.btn-notch:active {
+    transform: translateY(2px);
+}
+
+.submitBtn {
+    --btn-stroke: var(--accent);
+    --btn-fill: var(--accent);
+    --btn-text: #16091f;
+}
+
+.submitBtn:hover {
+    --btn-stroke: var(--accent-strong);
+    --btn-fill: var(--accent-strong);
+}
+
+.cancelBtn {
+    --btn-stroke: var(--border);
+    --btn-fill: transparent;
+}
+
+.cancelBtn:hover {
+    --btn-fill: var(--panel-2);
 }
 
 .addBtn {
-    padding: 12px 22px;
-    font-size: 16px;
-    font-family: 'Space Grotesk', 'Inter', 'Segoe UI', system-ui, sans-serif;
-    font-weight: 600;
-    cursor: pointer;
-    background: linear-gradient(140deg, var(--accent-purple), var(--accent-violet));
-    color: white;
-    border: 2px solid rgba(168, 85, 247, 0.9);
-    border-radius: 10px;
-    transition: all 0.3s ease;
+    --btn-stroke: var(--accent);
+    --btn-fill: var(--accent);
+    --btn-text: #16091f;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.addBtn .btn-notch__inner {
+    font-size: 11px;
+    padding: 13px 16px;
+}
+
+.addBtn .icon {
+    width: 14px;
+    height: 14px;
 }
 
 .addBtn:hover {
-    background: linear-gradient(140deg, var(--hover-purple), var(--hover-violet));
-    transform: translateY(-2px) scale(1.01);
+    --btn-stroke: var(--accent-strong);
+    --btn-fill: var(--accent-strong);
 }
 
-/* Modal Overlay */
+.sidebar__bulk-add {
+    width: 100%;
+    flex-shrink: 0;
+    margin-top: var(--s2);
+}
+
+.sidebar__bulk-add .btn-notch__inner {
+    font-size: 11px;
+    padding: 9px 16px;
+}
+
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+    background: rgba(5, 4, 12, 0.65);
+    border: 2px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+
+.icon-btn:hover {
+    color: var(--card-accent, var(--accent-strong));
+    border-color: var(--card-accent, var(--accent-strong));
+}
+
+.icon-btn.is-active {
+    color: var(--card-accent, var(--accent));
+    border-color: var(--card-accent, var(--accent));
+    background: color-mix(in srgb, var(--card-accent, var(--accent)) 20%, transparent);
+}
+
+.icon-btn--sm {
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    border-width: 1px;
+    background: none;
+}
+
+.icon-btn--danger:hover {
+    color: var(--danger-strong);
+    border-color: var(--danger-strong);
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+.app {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: var(--s5);
+    height: 100%;
+    max-width: 1560px;
+    margin: 0 auto;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4);
+    min-height: 0;
+    padding: var(--s5) var(--s4);
+    background: var(--panel-glass);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border-soft);
+}
+
+/* ---- Mobile top bar + off-canvas drawer ----
+   Below 980px the sidebar has too much in it (views, library filters,
+   collections, genres, backup controls) to sit above the content, so
+   it slides in from a slim always-visible bar instead. Both are no-ops
+   above 980px: the bar stays hidden and the sidebar never gets the
+   fixed/transform treatment. */
+.mobile-topbar,
+.sidebar__close,
+.sidebar__backdrop {
+    display: none;
+}
+
+.sidebar__scroll {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s5);
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: var(--s1);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s2);
+    flex-shrink: 0;
+}
+
+.brand__logo {
+    width: 140px;
+    height: 140px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.7));
+}
+
+.brand__name {
+    font-family: var(--font-pixel);
+    font-size: 21px;
+    line-height: 1.4;
+    color: var(--accent-strong);
+    text-shadow: 3px 3px 0 var(--accent-hover);
+}
+
+.brand__tagline {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 4px;
+}
+
+/* ---- Sidebar navigation ---- */
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.nav__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: var(--s2);
+    padding: 0 var(--s2);
+}
+
+.nav__hint {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: var(--s2);
+}
+
+.nav__item {
+    --n: 6px;
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    width: 100%;
+    padding: 9px var(--s2);
+    background: none;
+    border: 0;
+    border-left: 2px solid transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s var(--ease), color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.nav__item .icon {
+    width: 15px;
+    height: 15px;
+    opacity: 0.75;
+    transition: opacity 0.15s var(--ease);
+}
+
+.nav__item:hover .icon,
+.nav__item.is-active .icon {
+    opacity: 1;
+}
+
+.nav__label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav__count {
+    font-size: 10px;
+    color: var(--text-dim);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 7px;
+}
+
+.nav__item:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--text-primary);
+}
+
+/* A box-shadow inset is a stroke around the single clipped octagon —
+   at the diagonal cut corners that stroke gets anti-aliased same as a
+   thin border would, reading thinner than the straight sides no matter
+   how wide the spread is. Same two-stacked-shape fix as the modal
+   frame instead: the button itself becomes the border-coloured layer
+   and ::before, inset by --bw with the corrected smaller cut (see
+   .notch-inner above), carries the real fill — content stays above it
+   since it's the only negative-z-index layer in this stacking context. */
+.nav__item.is-active,
+.nav__row.is-active .nav__item {
+    --bw: 2px;
+    position: relative;
+    isolation: isolate;
+    background: var(--border-soft);
+    border-left-color: var(--accent-strong);
+    color: var(--text-primary);
+}
+
+.nav__item.is-active::before,
+.nav__row.is-active .nav__item::before {
+    content: '';
+    position: absolute;
+    inset: var(--bw);
+    z-index: -1;
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.28), rgba(139, 92, 246, 0.08) 70%);
+    --ni: calc(var(--n) - var(--bw) * 0.4);
+    clip-path: polygon(var(--ni) 0, calc(100% - var(--ni)) 0,
+            100% var(--ni), 100% calc(100% - var(--ni)),
+            calc(100% - var(--ni)) 100%, var(--ni) 100%,
+            0 calc(100% - var(--ni)), 0 var(--ni));
+}
+
+.nav__item.is-active .nav__count,
+.nav__row.is-active .nav__count {
+    background: var(--accent);
+    color: #16091f;
+}
+
+.nav__star {
+    width: 15px;
+    height: 15px;
+}
+
+.dot {
+    width: 9px;
+    height: 9px;
+    flex-shrink: 0;
+    background: var(--text-dim);
+    margin: 0 3px;
+}
+
+.dot[data-status="playing"] {
+    background: var(--amber);
+}
+
+.dot[data-status="completed"] {
+    background: var(--green);
+}
+
+/* Collection rows reveal their rename/delete controls on hover only —
+   at rest the sidebar stays a clean list of names. */
+.nav__row {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.nav__row-actions {
+    position: absolute;
+    right: var(--s2);
+    display: flex;
+    gap: var(--s1);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s var(--ease);
+}
+
+.nav__row:hover .nav__row-actions,
+.nav__row:focus-within .nav__row-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.nav__row:hover .nav__count {
+    opacity: 0;
+}
+
+/* ---- Chips ---- */
+.chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 var(--s2);
+}
+
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.02em;
+    padding: 5px 9px;
+    border: 1px solid var(--border);
+    background: rgba(36, 29, 64, 0.6);
+    color: var(--text-secondary);
+}
+
+button.tag-chip {
+    cursor: pointer;
+    transition: border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+button.tag-chip:hover {
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+button.tag-chip.is-active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #16091f;
+}
+
+button.tag-chip:disabled {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+}
+
+#topModalUseReview {
+    align-self: flex-start;
+    margin-top: 6px;
+}
+
+/* ============================================================
+   MAIN AREA
+   ============================================================ */
+.main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    gap: var(--s4);
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    flex-shrink: 0;
+}
+
+.search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 460px;
+}
+
+.search__icon {
+    position: absolute;
+    left: 13px;
+    width: 16px;
+    height: 16px;
+    color: var(--text-dim);
+    pointer-events: none;
+}
+
+.search input {
+    --n: 6px;
+    width: 100%;
+    padding: 11px 42px 11px 38px;
+    background: var(--panel-glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-soft);
+    border-radius: 0;
+    color: var(--text-primary);
+    font-family: var(--font-term);
+    font-size: 17px;
+    transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.search input::-webkit-search-cancel-button {
+    filter: invert(0.6);
+}
+
+.search input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--ring);
+}
+
+.search__kbd {
+    position: absolute;
+    right: 11px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    pointer-events: none;
+}
+
+.search input:focus ~ .search__kbd {
+    opacity: 0;
+}
+
+.select {
+    --n: 6px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    padding: 0 var(--s3);
+    background: var(--panel-glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-soft);
+}
+
+.select__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+.select select {
+    appearance: none;
+    background: none;
+    border: 0;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 12px 22px 12px 0;
+    cursor: pointer;
+}
+
+.select select:focus {
+    outline: none;
+}
+
+.select select option {
+    background: var(--panel);
+}
+
+.select__caret {
+    position: absolute;
+    right: 10px;
+    width: 13px;
+    height: 13px;
+    color: var(--text-dim);
+    pointer-events: none;
+}
+
+.toolbar__count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    white-space: nowrap;
+}
+
+.main__scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Top padding clears the mask's fade zone below (14px) — otherwise
+       the first row sits inside it and reads as clipped rather than
+       faded. */
+    padding: var(--s4) 4px 40px;
+    /* Cards fade out at the scroll edge instead of being cut off flush. */
+    mask-image: linear-gradient(to bottom, transparent 0, black 14px, black calc(100% - 46px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 14px, black calc(100% - 46px), transparent 100%);
+}
+
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+    margin-bottom: var(--s4);
+}
+
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: rgba(168, 85, 247, 0.16);
+    border: 1px solid var(--accent);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: capitalize;
+    cursor: pointer;
+}
+
+.filter-pill .icon {
+    width: 11px;
+    height: 11px;
+}
+
+.filter-pill:hover {
+    background: rgba(168, 85, 247, 0.3);
+}
+
+.filter-pill--clear {
+    background: none;
+    border-color: var(--border);
+    color: var(--text-dim);
+}
+
+/* ============================================================
+   GAME GRID
+   Auto-fill columns instead of fixed-width cards: the grid reflows to
+   whatever space it has, and the cards keep their poster ratio.
+   ============================================================ */
+.shows {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: var(--s5);
+    align-items: start;
+}
+
+.shows__section-label {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding-top: var(--s3);
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+.shows__section-label:first-child {
+    padding-top: 0;
+    border-top: none;
+}
+
+/* Unrated games read as "not finished yet" — desaturated until the first
+   rating lands, at which point renderShows moves the card out of the
+   section entirely. Grayscale sits on the outer frame (not just .show)
+   so the accent-colored ring desaturates too; the extra class on both
+   selectors below outweighs .shows .show-frame:hover's filter reset. */
+.show-frame--unreviewed {
+    filter: grayscale(0.9);
+}
+
+.shows .show-frame.show-frame--unreviewed:hover,
+.shows .show-frame.show-frame--unreviewed.is-tilting {
+    filter: grayscale(0.9) drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55));
+}
+
+.show-frame {
+    --card-accent: var(--accent);
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.18s var(--ease), filter 0.18s var(--ease);
+}
+
+.show-frame:hover {
+    transform: translateY(-4px);
+    filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55));
+}
+
+.show-frame:focus-visible {
+    outline: none;
+    filter: drop-shadow(0 0 0 3px var(--accent-strong));
+}
+
+/* The library grid's hover (lift) is replaced here — and on .tier-item
+   and .cover-card, the two other cards that get a cursor-tracked tilt
+   applied directly via inline transform (script.js/script-tiers.js) —
+   by these shared rules, so the CSS hover stays out of its way. Keyboard
+   focus still needs its own visible ring, via box-shadow instead of
+   filter so it doesn't fight the inline tilt transform. */
+.shows .show-frame:hover,
+.tier-item.show-frame:hover,
+.tier-item.show-frame:focus-visible,
+.cover-card.show-frame:hover,
+.cover-card.show-frame:focus-visible {
+    transform: none;
+    filter: none;
+}
+
+.shows .show-frame:focus-visible,
+.tier-item.show-frame:focus-visible,
+.cover-card.show-frame:focus-visible {
+    box-shadow: 0 0 0 3px var(--accent-strong);
+}
+
+.shows .show-frame.is-tilting,
+.tier-item.is-tilting,
+.cover-card.is-tilting {
+    transition: transform 0.12s ease-out, box-shadow 0.2s var(--ease);
+    box-shadow: 8px 10px 0 rgba(0, 0, 0, 0.55);
+    z-index: 3;
+    will-change: transform;
+}
+
+.show {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 9 / 16;
+    padding: var(--s4);
+    overflow: hidden;
+    background-color: var(--panel);
+    background-image:
+        linear-gradient(to bottom, rgba(26, 21, 48, 0) 6%, rgba(11, 10, 22, 0.55) 40%, rgba(11, 10, 22, 0.96) 68%, var(--panel) 90%),
+        var(--bg-image, none);
+    background-size: cover;
+    background-position: center top;
+}
+
+/* CRT scanlines over the artwork only. */
+.show__scan {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 55%;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0 1px, transparent 1px 3px);
+}
+
+.show__topbar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--s2);
+}
+
+.show__seals {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.removeXBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
+    padding: 0;
+    background: rgba(5, 4, 12, 0.55);
+    border: 1px solid rgba(239, 68, 68, 0.6);
+    color: var(--danger-strong);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s var(--ease), background-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.show-frame:hover .removeXBtn,
+.show-frame:focus-within .removeXBtn {
+    opacity: 1;
+}
+
+.removeXBtn:hover {
+    background: var(--danger);
+    color: #fff;
+}
+
+.rating-seal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 22px;
+    padding: 0 7px;
+    background: rgba(5, 4, 12, 0.72);
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* Hidden until hovered/focused — unless it's already active, in which
+   case it stays visible so the favorite state reads at a glance. Also
+   doubles as the toggle — click it to flip it. */
+.favorite-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    background: rgba(5, 4, 12, 0.72);
+    border: 2px solid var(--border-soft, var(--border));
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.show-frame:hover .favorite-badge,
+.show-frame:focus-within .favorite-badge,
+.favorite-badge.is-active {
+    opacity: 1;
+}
+
+.favorite-badge:hover {
+    border-color: var(--gold);
+}
+
+.favorite-badge.is-active {
+    border-color: var(--gold);
+}
+
+.favorite-badge:not(.is-active) .pixel-star {
+    filter: grayscale(1) opacity(0.6);
+}
+
+.favorite-badge .pixel-star {
+    width: 12px;
+    height: 12px;
+}
+
+.pixel-star {
+    width: 16px;
+    height: 16px;
+    image-rendering: pixelated;
+    filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.5));
+}
+
+.show-info {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    margin-bottom: var(--s3);
+}
+
+.show-title {
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--card-accent);
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.show-year {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: var(--s2);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.show-year::before {
+    content: "> ";
+    color: var(--card-accent);
+}
+
+.show-description {
+    font-family: var(--font-term);
+    font-size: 16px;
+    line-height: 1.3;
+    color: var(--text-secondary);
+    margin-bottom: var(--s2);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.show-actions {
+    position: relative;
+    z-index: 1;
+}
+
+.toggleWatchedBtn {
+    --btn-stroke: #4b5563;
+    --btn-fill: rgba(36, 29, 64, 0.85);
+    --btn-text: #94a3b8;
+    width: 100%;
+}
+
+.toggleWatchedBtn .btn-notch__inner {
+    padding: 9px 6px;
+    font-size: 9px;
+}
+
+.toggleWatchedBtn:hover {
+    --btn-fill: #4b5563;
+    --btn-text: #fff;
+}
+
+.show[data-status="playing"] .toggleWatchedBtn {
+    --btn-stroke: var(--amber);
+    --btn-text: var(--amber);
+}
+
+.show[data-status="playing"] .toggleWatchedBtn:hover {
+    --btn-fill: var(--amber);
+    --btn-text: #16091f;
+}
+
+.show[data-status="completed"] .toggleWatchedBtn {
+    --btn-stroke: var(--green);
+    --btn-text: var(--green);
+}
+
+.show[data-status="completed"] .toggleWatchedBtn:hover {
+    --btn-fill: var(--green);
+    --btn-text: #062018;
+}
+
+/* ---- Rating bars ---- */
+.aspect-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+    z-index: 1;
+}
+
+.aspect-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.aspect-bar-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.aspect-bar-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.aspect-bar-track {
+    display: flex;
+    gap: 3px;
+    height: 10px;
+}
+
+/* Ten fixed pixel slots. A whole point grows a pixel to a full square; a
+   decimal grows it proportionally — 9.7 is 9 squares plus one at 70%. */
+.pixel-block {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pixel-block-dot {
+    display: block;
+    width: calc(22% + var(--fill) * 78%);
+    height: calc(22% + var(--fill) * 78%);
+    background: color-mix(in srgb, black calc((1 - var(--pos)) * 60%), var(--bar-color));
+    opacity: calc(0.4 + var(--fill) * 0.6);
+}
+
+.aspect-bar-value {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-align: right;
+    color: var(--text-secondary);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+/* Compact: label + bar on one line (library card, 5 aspects stacked in
+   5 lines total) instead of the detail view's label-above-bar-below. */
+.aspect-bars--compact .aspect-bar {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+}
+
+.aspect-bars--compact .aspect-bar-head {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    gap: 5px;
+}
+
+.aspect-bars--compact .aspect-bar-label {
+    width: 62px;
+}
+
+.aspect-bars--compact .aspect-bar-value {
+    width: 18px;
+    text-align: left;
+}
+
+.aspect-bars--compact .aspect-bar-track {
+    flex: 1;
+    height: 8px;
+}
+
+/* ---- Empty states ---- */
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s3);
+    padding: 80px var(--s5);
+    text-align: center;
+}
+
+.empty__art {
+    font-size: 46px;
+    filter: grayscale(0.3);
+}
+
+.empty__title {
+    font-family: var(--font-pixel);
+    font-size: 15px;
+    color: var(--accent-strong);
+    line-height: 1.6;
+}
+
+.empty__text {
+    color: var(--text-secondary);
+    max-width: 40ch;
+}
+
+.empty .btn-notch {
+    margin-top: var(--s2);
+}
+
+/* ============================================================
+   ANIMATIONS
+   Named keyframes referenced by `animation:` all over this file —
+   without these, an animation naming a keyframe that doesn't exist is
+   simply a no-op, which is easy to miss visually but breaks anything
+   that waits on an `animationend` event to fire (a toast never removes
+   itself from the DOM once its dismiss timer adds `.is-leaving`).
+   ============================================================ */
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Opacity-only: some elements this drives (.modal-container,
+   .detail-container) already have their own static `transform:
+   translate(-50%, -50%)` for centering, others (.popover) have none —
+   animating `transform` here would clobber whichever base value each
+   one relies on for the animation's duration, causing a visible jump. */
+@keyframes pop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toast-out {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -100% 0; }
+}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(4px);
+    inset: 0;
+    background: rgba(5, 4, 12, 0.78);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     z-index: 100;
+    animation: fade-in 0.16s var(--ease);
 }
 
-/* Modal Container */
+.modal-overlay--top {
+    z-index: 200;
+}
+
 .modal-container {
+    /* Same two-stacked-shape notch border as .notch-frame/.notch-inner
+       (see NOTCHED SHAPES above) — a plain `border` can't follow the
+       octagon clip-path, so this outer box is just the border-coloured
+       frame and .modal-container__inner, inset by --bw with its own
+       smaller cut, is where the real background/content lives. */
+    --n: 12px;
+    --bw: 3px;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(12, 18, 33, 0.95));
-    padding: 34px;
-    border-radius: 16px;
     z-index: 101;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
-    border: 1px solid rgba(168, 85, 247, 0.25);
-    backdrop-filter: blur(10px);
+    width: 92%;
+    max-width: 440px;
+    padding: var(--bw);
+    background: var(--border-soft);
+    box-shadow: var(--shadow-lift), 0 0 70px -26px var(--accent);
+    animation: pop-in 0.18s var(--ease);
 }
 
-#showForm h2 {
-    margin-bottom: 20px;
-    color: var(--text-primary);
-    background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: 0.015em;
+.modal-container--top {
+    z-index: 201;
+}
+
+.modal-container__inner {
+    flex: 1;
+    min-height: 0;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: var(--s6) var(--s5);
+    background: rgba(5, 4, 12, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.modal-container h2 {
+    font-family: var(--font-pixel);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--accent-strong);
+    margin-bottom: var(--s5);
+    padding-bottom: var(--s3);
+    border-bottom: 1px solid var(--border-soft, var(--border));
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
 }
 
 .formEntry {
-    margin-bottom: 15px;
     display: flex;
     flex-direction: column;
+    margin-bottom: var(--s4);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s3);
 }
 
 .formEntry label {
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: var(--text-primary);
+    margin-bottom: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
 }
 
 .formEntry input,
 .formEntry select,
 .formEntry textarea {
-    padding: 10px;
-    border: 1px solid rgba(168, 85, 247, 0.28);
-    border-radius: 10px;
-    font-size: 15px;
-    background-color: var(--bg-surface);
+    padding: 10px 12px;
+    border: 2px solid var(--border);
+    border-radius: 0;
+    font-size: 17px;
+    background: var(--bg);
     color: var(--text-primary);
-    font-family: 'Space Grotesk', 'Inter', 'Segoe UI', system-ui, sans-serif;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    font-family: var(--font-term);
+    transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
     resize: vertical;
 }
 
@@ -146,175 +1338,2637 @@ body {
 .formEntry select:focus,
 .formEntry textarea:focus {
     outline: none;
-    border-color: var(--accent-purple);
-    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.22);
-    background-color: #121c31;
+    border-color: var(--accent);
+    box-shadow: var(--ring);
+}
+
+.field-hint {
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    min-height: 14px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
 }
 
 .form-buttons {
     display: flex;
-    gap: 12px;
-    margin-top: 20px;
+    gap: var(--s3);
+    margin-top: var(--s5);
 }
 
-.submitBtn,
-.cancelBtn {
+.form-buttons .btn-notch {
     flex: 1;
-    padding: 12px;
-    font-size: 15px;
-    border: none;
-    border-radius: 10px;
+}
+
+/* A danger action (delete) sizes to its own label instead of stretching
+   equally with Save — otherwise a longer label like "Delete card" wraps
+   in a narrow panel and the two buttons read as mismatched weight. */
+.form-buttons .btn-notch.icon-btn--danger {
+    flex: 0 0 auto;
+}
+
+.swatch-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+}
+
+.swatch {
+    width: 28px;
+    height: 28px;
+    background: var(--swatch, var(--accent));
+    border: 2px solid transparent;
+    outline: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.12s var(--ease);
+}
+
+.swatch:hover {
+    transform: scale(1.12);
+}
+
+.swatch.is-active {
+    border-color: var(--text-primary);
+    outline-color: var(--text-primary);
+}
+
+/* ---- Confirm / prompt ---- */
+.confirm {
+    max-width: 400px;
+}
+
+.confirm .confirm__title {
+    font-size: 13px;
+    margin-bottom: var(--s3);
+}
+
+.confirm__message {
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-bottom: var(--s2);
+}
+
+.confirm.is-danger {
+    border-color: var(--danger);
+}
+
+.confirm.is-danger .confirm__title {
+    color: var(--danger-strong);
+}
+
+.confirm.is-danger .submitBtn {
+    --btn-stroke: var(--danger);
+    --btn-fill: var(--danger);
+    --btn-text: #fff;
+}
+
+.confirm.is-danger .submitBtn:hover {
+    --btn-stroke: var(--danger-strong);
+    --btn-fill: var(--danger-strong);
+}
+
+/* ---- Toasts ---- */
+.toast-host {
+    position: fixed;
+    left: 50%;
+    bottom: var(--s5);
+    transform: translateX(-50%);
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    pointer-events: none;
+}
+
+.toast {
+    --n: 8px;
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+    padding: 12px 18px;
+    background: var(--panel-2);
+    border: 2px solid var(--accent);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    box-shadow: var(--shadow-lift);
+    pointer-events: auto;
+    animation: toast-in 0.22s var(--ease);
+}
+
+.toast.is-leaving {
+    animation: toast-out 0.18s var(--ease) forwards;
+}
+
+.toast__action {
+    background: none;
+    border: 0;
+    color: var(--accent-strong);
+    font: inherit;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     cursor: pointer;
 }
 
-.submitBtn {
-    background: linear-gradient(140deg, var(--accent-purple), var(--accent-violet));
-    color: white;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 28px rgba(168, 85, 247, 0.25);
-}
-
-.submitBtn:hover {
-    background: linear-gradient(140deg, var(--hover-purple), var(--hover-violet));
-    transform: translateY(-2px) scale(1.01);
-    box-shadow: 0 12px 32px rgba(168, 85, 247, 0.3);
-}
-
-.cancelBtn {
-    background-color: var(--bg-surface);
+.toast__action:hover {
     color: var(--text-primary);
-    border: 1px solid rgba(168, 85, 247, 0.28);
-    transition: all 0.3s ease;
 }
 
-.cancelBtn:hover {
-    background-color: rgba(168, 85, 247, 0.08);
-    border-color: var(--accent-purple);
-    transform: translateY(-2px);
+/* ---- Popovers ---- */
+.popover {
+    --n: 8px;
+    position: absolute;
+    z-index: 6;
+    min-width: 190px;
+    padding: var(--s3);
+    background: var(--panel);
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow-lift);
+    animation: pop-in 0.14s var(--ease);
 }
 
-/* Shows Container */
-.shows {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 22px;
-    justify-content: center;
+/* Same two-stacked-shape notch border as the modal windows
+   (.modal-container/.modal-container__inner) instead of the flat-bordered
+   .popover above — this one wraps its content in .popover__inner, which
+   picks up the border via .notch-inner. */
+.popover--tags {
+    --n: 10px;
+    --bw: 3px;
+    min-width: 0;
+    padding: var(--bw);
+    background: var(--border-soft);
+    border: 0;
 }
 
-/* Show Card */
-.show {
-    background-color: var(--bg-card);
-    background-image:
-        linear-gradient(to bottom, rgba(15, 23, 42, 0) 10%, rgba(15, 23, 42, 0.2) 30%, rgba(15, 23, 42, 0.9) 50%, rgba(15, 23, 42, 0.98) 80%, var(--bg-card) 100%),
-        var(--bg-image);
-    background-size: cover;
-    background-position: center top;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
-    padding: 18px;
-    border: 2px solid rgba(168, 85, 247, 0.2);
-    transition: all 0.3s ease;
+.popover--tags .popover__inner {
+    padding: var(--s3);
+    background: var(--panel);
+    min-width: 184px;
+}
+
+#detailColorPopup {
+    top: 52px;
+    right: 14px;
+}
+
+/* Anchored under its own trigger in the icon row rather than reusing
+   the library card's body-level popover — that one is positioned from
+   viewport coordinates and can render outside the modal's own bounds;
+   this one is just another child of .detail-inner, so it can't. */
+#detailAwardsPopover {
+    top: 52px;
+    right: 96px;
+    max-width: 240px;
+}
+
+.popover__title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: var(--s2);
+}
+
+.popover__list {
     display: flex;
     flex-direction: column;
-    height: 480px;
-    width: 280px;
-    flex-shrink: 0;
-    position: relative;
+    max-height: 168px;
+    overflow-y: auto;
+    margin-bottom: var(--s2);
 }
 
-.show:hover {
-    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
-    border-color: rgba(168, 85, 247, 0.5);
-    transform: translateY(-4px) scale(1.01);
+.popover__item {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    padding: 6px var(--s2);
+    background: none;
+    border: 0;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    text-align: left;
+    cursor: pointer;
 }
 
-.show-info {
-    margin-bottom: 12px;
-    margin-top: auto;
-    position: relative;
-    z-index: 1;
+.popover__item:hover {
+    background: rgba(139, 92, 246, 0.16);
+    color: var(--text-primary);
 }
 
-.show-title {
-    color: inherit;
-    margin-bottom: 10px;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.01em;
+.popover__check {
+    width: 12px;
+    color: var(--card-accent, var(--accent));
 }
 
-.show-info p {
-    color: var(--text-secondary);
+.popover__item.is-on {
+    color: var(--text-primary);
+}
+
+.add-aspect-row {
+    display: flex;
+    gap: 6px;
+}
+
+.add-aspect-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 2px solid var(--border);
+    border-radius: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-term);
     font-size: 15px;
-    margin-bottom: 6px;
 }
 
-.show-description {
-    font-style: italic;
+.add-aspect-row input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.add-aspect-row button {
+    padding: 8px 12px;
+    border: 0;
+    background: var(--panel-2);
+    color: var(--accent-strong);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.add-aspect-row button:hover {
+    background: var(--accent);
+    color: #16091f;
+}
+
+/* ============================================================
+   DETAIL PANEL
+   Fixed size on purpose: every block clamps its content instead of
+   growing, so the frame never shifts and there's no page-in-a-page
+   scrollbar.
+   ============================================================ */
+.detail-container {
+    --card-accent: var(--accent);
+    --n: 14px;
+    --bw: 3px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 101;
+    width: min(1120px, 94vw);
+    height: min(700px, 92vh);
+    box-shadow: 0 0 60px rgba(139, 92, 246, 0.22), var(--shadow-lift);
+    animation: pop-in 0.2s var(--ease);
+}
+
+.detail-inner {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-deep);
+}
+
+.detail-pixel-canvas {
+    position: absolute;
+    inset: 0;
+    /* A canvas is a replaced element: `inset: 0` alone leaves it at its
+       intrinsic 300×150 unless width/height are forced. */
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: var(--pixel-bg-tint, var(--bg-deep));
+}
+
+/* Stacked background-images can't let a lower layer show through an
+   opaque one above, so the fade to the pixel field is a mask on the
+   whole element rather than a gradient inside it. */
+.detail-backdrop {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 330px;
+    z-index: 1;
+    background-image:
+        linear-gradient(to bottom, rgba(11, 10, 22, 0.1) 0%, rgba(11, 10, 22, 0.25) 55%, rgba(11, 10, 22, 0.5) 100%),
+        var(--bg-image, none);
+    background-size: cover;
+    background-position: center top;
+    mask-image: linear-gradient(to bottom, black 0%, black 40%, transparent 82%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 40%, transparent 82%);
+}
+
+.detail-icon-row {
+    position: absolute;
+    top: var(--s3);
+    right: var(--s3);
+    z-index: 4;
+    display: flex;
+    gap: var(--s2);
+}
+
+.detail-color-swatch {
+    width: 32px;
+    height: 32px;
+    background: var(--swatch, var(--accent));
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: transform 0.12s var(--ease);
+}
+
+.detail-color-swatch:hover {
+    transform: scale(1.06);
+    border-color: var(--text-primary);
+}
+
+/* Only reachable in About me's ref-modal, where there's no game to
+   color yet until one's chosen. */
+.detail-color-swatch:disabled {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+}
+
+.detail-close-btn {
+    border-color: var(--card-accent);
+    color: var(--card-accent);
+}
+
+.detail-close-btn:hover {
+    background: var(--card-accent);
+    color: var(--bg-deep);
+}
+
+.detail-fav-btn:not(.is-active) .pixel-star {
+    filter: grayscale(1) brightness(0.55);
+}
+
+.detail-fav-btn.is-active {
+    border-color: var(--gold);
+    background: rgba(251, 191, 36, 0.16);
+}
+
+.detail-content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    height: 100%;
+}
+
+.detail-hero {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--s5);
+    padding: 116px var(--s6) var(--s4);
+}
+
+/* The tilt itself is computed from the live cursor position in JS — a
+   fixed :hover rotation would lean the same way wherever the pointer is. */
+.detail-cover {
+    width: 122px;
+    height: 168px;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.55);
+    transition: transform 0.12s ease-out, box-shadow 0.2s var(--ease);
+    will-change: transform;
+}
+
+.detail-cover.is-tilting {
+    box-shadow: 14px 16px 0 rgba(0, 0, 0, 0.5);
+}
+
+.detail-hero__text {
+    flex: 1;
+    min-width: 0;
+}
+
+.detail-title {
+    font-family: var(--font-pixel);
+    font-size: 21px;
     line-height: 1.4;
-    margin-bottom: 10px !important;
-    opacity: 0.9;
+    color: var(--card-accent);
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.65);
+    margin-bottom: var(--s2);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.detail-meta {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
+    margin-bottom: var(--s3);
+}
+
+.detail-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    max-height: 60px;
+    overflow: hidden;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 1px solid currentColor;
+    color: #94a3b8;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.status-badge[data-status="playing"] {
+    color: var(--amber);
+}
+
+.status-badge[data-status="completed"] {
+    color: var(--green);
+}
+
+.tag-chip--collection {
+    border-color: var(--cyan);
+    color: var(--cyan);
+}
+
+/* The × only shows after a beat of hovering, so a row of tags doesn't
+   read as a row of delete buttons at rest. */
+.tag-remove {
+    background: none;
+    border: 0;
+    color: inherit;
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: opacity 0.15s var(--ease) 0s, max-width 0.15s var(--ease) 0s;
+}
+
+.tag-chip--own:hover .tag-remove,
+.tag-chip--collection:hover .tag-remove {
+    max-width: 14px;
+    opacity: 1;
+    transition-delay: 0.7s;
+}
+
+.tag-remove:hover {
+    color: var(--danger-strong);
+}
+
+.tag-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+    background: none;
+    border: 1px dashed var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.tag-add-btn:hover {
+    border-style: solid;
+    border-color: var(--card-accent);
+    color: var(--card-accent);
+}
+
+.detail-body {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: var(--s5) var(--s6);
+    min-height: 0;
+    padding: 0 var(--s6);
+}
+
+.detail-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4);
+    min-height: 0;
+    min-width: 0;
+    overflow-y: auto;
+}
+
+.detail-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.detail-section--tabs {
+    flex: 1 1 auto;
+}
+
+.detail-section--rate {
+    flex: 1 1 auto;
+}
+
+/* ---- Description / review: Chrome-style tabs sharing one pane instead
+   of two sections stacked (and fighting each other for height). ---- */
+.detail-tabbar {
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+    margin-bottom: var(--s3);
+    border-bottom: 1px solid var(--border-soft, var(--border));
+    flex-shrink: 0;
+}
+
+.detail-tabbar__edit {
+    margin-left: auto;
+}
+
+.detail-tab {
+    padding: 4px 2px 8px;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.detail-tab:hover {
+    color: var(--text-primary);
+}
+
+.detail-tab.is-active {
+    color: var(--card-accent);
+    border-bottom-color: var(--card-accent);
+}
+
+.detail-tab-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+}
+
+.detail-h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s2);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--card-accent);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+    margin-bottom: var(--s2);
+    flex-shrink: 0;
+}
+
+.detail-description {
+    font-family: var(--font-term);
+    font-size: 16.5px;
+    line-height: 1.35;
+    color: var(--text-secondary);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7);
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.detail-review-box,
+.detail-rate-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+}
+
+.detail-review-text {
+    font-family: var(--font-term);
+    font-size: 16px;
+    line-height: 1.35;
+    color: var(--text-secondary);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7);
+    white-space: pre-wrap;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.detail-review-input {
+    flex: 1;
+    width: 100%;
+    min-height: 82px;
+    padding: 10px 12px;
+    border: 2px solid var(--card-accent);
+    border-radius: 0;
+    background: rgba(5, 4, 12, 0.6);
+    color: var(--text-primary);
+    font-family: var(--font-term);
+    font-size: 16px;
+    resize: none;
+}
+
+.detail-review-input:focus {
+    outline: none;
+    box-shadow: var(--ring);
+}
+
+.add-review-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s2);
+    flex: 1;
+    min-height: 74px;
+    background: none;
+    border: 2px dashed var(--border);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.add-review-btn .icon {
+    width: 13px;
+    height: 13px;
+}
+
+.add-review-btn:hover {
+    border-color: var(--card-accent);
+    color: var(--card-accent);
+}
+
+.detail-rate-box .aspect-bars {
+    gap: 7px;
+}
+
+.detail-rate-box .aspect-bar-label {
+    font-size: 10px;
+}
+
+.aspect-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 90px;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-bottom: var(--s2);
+    padding-right: 4px;
+}
+
+.aspect-row {
+    display: grid;
+    grid-template-columns: 82px 1fr 20px;
+    align-items: center;
+    gap: var(--s2);
+}
+
+.aspect-row label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+input.aspect-input[type="number"] {
+    width: 100%;
+    padding: 5px 8px;
+    border: 2px solid var(--border);
+    border-radius: 0;
+    background: rgba(5, 4, 12, 0.6);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+input.aspect-input[type="number"]:focus {
+    outline: none;
+    border-color: var(--card-accent);
+}
+
+.aspect-remove {
+    background: none;
+    border: 0;
+    color: var(--text-dim);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.aspect-remove:hover {
+    color: var(--danger-strong);
+}
+
+.rating-average {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--gold);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
+    margin-top: auto;
+    padding-top: var(--s2);
+}
+
+/* ---- Related games: exactly one row, columns sized to the panel ---- */
+.detail-related {
+    padding: var(--s3) var(--s6) var(--s5);
+}
+
+/* One explicit row sized to content; any extra items land on implicit
+   rows of zero height and get clipped, so the strip is always exactly
+   one row tall however many results come back. Columns cap at 100px —
+   uncapped (`1fr`) columns stretch to fill the row when there are only
+   one or two results, and since each card's height is driven by its
+   width (aspect-ratio), that stretch also grows the row itself,
+   squeezing the description/ratings panel above it down to nothing. */
+.detail-related-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(74px, 100px));
+    grid-template-rows: auto;
+    grid-auto-rows: 0;
+    gap: var(--s3);
+    overflow: hidden;
+}
+
+.related-card {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.85);
+    transition: transform 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.related-card img,
+.related-card-noimg {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    background: var(--bg-deep);
+    border: 2px solid var(--border);
+    transition: border-color 0.15s var(--ease);
+}
+
+.related-card__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.related-card:hover {
+    transform: translateY(-3px);
+    color: var(--card-accent);
+}
+
+.related-card:hover img,
+.related-card:hover .related-card-noimg {
+    border-color: var(--card-accent);
+}
+
+.related-card--skeleton {
+    aspect-ratio: 3 / 4;
+    background: linear-gradient(100deg, rgba(255, 255, 255, 0.04) 30%, rgba(255, 255, 255, 0.11) 50%, rgba(255, 255, 255, 0.04) 70%);
+    background-size: 220% 100%;
+    animation: shimmer 1.3s linear infinite;
+}
+
+/* ============================================================
+   SIDEBAR: view switcher + backup footer
+   ============================================================ */
+.nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s5);
+    padding-top: var(--s4);
+    border-top: 1px solid var(--border-soft);
+}
+
+.sidebar__footer {
+    flex-shrink: 0;
+    padding-top: var(--s3);
+    border-top: 1px solid var(--border-soft);
+}
+
+.sidebar__footer-hint {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    line-height: 1.3;
+    color: var(--text-dim);
+    padding-top: var(--s2);
+    border-top: 1px solid var(--border-soft);
+}
+
+/* ---- Save options: a single trigger tucked at the bottom of the
+   sidebar opens export/import/reset/clear as a menu above it, rather
+   than the four of them sitting always-expanded taking up sidebar
+   height. ---- */
+.save-options {
+    position: relative;
+}
+
+.save-options__trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    width: 100%;
+    padding: var(--s2) var(--s3);
+    background: rgba(5, 4, 12, 0.55);
+    border: 1px solid var(--border-soft);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.save-options__trigger span {
+    flex: 1;
+    text-align: left;
+}
+
+.save-options__trigger .icon {
+    width: 14px;
+    height: 14px;
+}
+
+.save-options__chevron {
+    display: inline-flex;
+    transform: rotate(180deg);
+    transition: transform 0.15s var(--ease);
+}
+
+.save-options__chevron .icon {
+    width: 12px;
+    height: 12px;
+}
+
+.save-options__trigger:hover,
+.save-options__trigger.is-open {
+    border-color: var(--accent-strong);
+    color: var(--text-primary);
+}
+
+/* Opens upward, anchored above the trigger — the trigger sits at the
+   very bottom of the sidebar, so there's no room to open down. */
+.data-actions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% + var(--s2));
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    padding: var(--s3);
+    background: var(--panel);
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow-lift);
+    animation: pop-in 0.14s var(--ease);
+    z-index: 20;
+}
+
+.data-action {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    width: 100%;
+    padding: var(--s2) var(--s3);
+    background: rgba(5, 4, 12, 0.4);
+    border: 1px solid var(--border-soft);
+    color: var(--text-secondary);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.data-action .icon {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    opacity: 0.8;
+    transition: opacity 0.15s var(--ease);
+}
+
+.data-action__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.data-action__label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-primary);
+}
+
+.data-action__desc {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    line-height: 1.3;
+    color: var(--text-dim);
+}
+
+.data-action:hover {
+    border-color: var(--accent-strong);
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.data-action:hover .icon {
+    opacity: 1;
+}
+
+.data-action--danger:hover {
+    border-color: var(--danger-strong);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.data-action--danger:hover .data-action__label {
+    color: var(--danger-strong);
+}
+
+/* ============================================================
+   VIEWS (Library / Tier maker / About me / Top 10)
+   ============================================================ */
+.view {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.view--scroll {
+    overflow-y: auto;
+    padding: 2px 2px 40px;
+}
+
+/* Tier maker: fills the viewport with no outer scroll — only the tier
+   rows (in .tier-scroll) scroll; the tray stays pinned at the bottom. */
+.view--split {
+    overflow: hidden;
+    padding: 2px 2px 8px;
+}
+
+.view-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--s4);
+    margin-bottom: var(--s5);
+}
+
+.view-title {
+    font-family: var(--font-pixel);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--accent-strong);
+    text-shadow: 2px 2px 0 var(--accent-hover);
+}
+
+.view-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 6px;
+}
+
+.view-head__tools {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   TIER MAKER
+   ============================================================ */
+.tier-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: var(--s3);
+}
+
+.tier-board {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+}
+
+.tier {
+    display: grid;
+    grid-template-columns: 76px 1fr 30px;
+    gap: var(--s3);
+    min-height: 128px;
+}
+
+.tier__label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tier, var(--accent));
+    color: #16091f;
+    border: 0;
+    font-family: var(--font-pixel);
+    font-size: 13px;
+    cursor: pointer;
+    filter: brightness(1);
+    transition: filter 0.15s var(--ease);
+}
+
+.tier__label:hover {
+    filter: brightness(1.18);
+}
+
+.tier__items {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 6px;
+    padding: var(--s2);
+    background: var(--panel-glass);
+    border: 1px solid var(--border);
+    transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.tier__items.is-over {
+    background: rgba(168, 85, 247, 0.14);
+    border-color: var(--accent);
+    border-style: solid;
+}
+
+.tier__actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
+.tier-item {
+    --card-accent: var(--tier-color, var(--accent));
+    position: relative;
+    width: 84px;
+    aspect-ratio: 9 / 16;
+    flex-shrink: 0;
+    overflow: hidden;
+    background-color: var(--panel-2);
+    background-image: var(--bg-image, none);
+    background-size: cover;
+    background-position: center top;
+    cursor: grab;
+}
+
+/* Hover/focus/tilt rules for .tier-item live with the shared .show-frame
+   tilt rules above. */
+
+.tier-item:active {
+    cursor: grabbing;
+}
+
+.tier-item.is-dragging {
+    opacity: 0.35;
+}
+
+/* Marks exactly where a dragged card will land inside a tier — height
+   comes from flex's default align-items: stretch matching the row's
+   other cards, no explicit sizing needed. */
+.tier-drop-indicator {
+    width: 4px;
+    border-radius: 2px;
+    background: var(--accent-strong);
+    box-shadow: 0 0 8px var(--accent-strong);
+    flex-shrink: 0;
+}
+
+.tier-item__name {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    padding: 10px 5px 5px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    line-height: 1.25;
+    color: var(--text-primary);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7);
+    background: linear-gradient(to top, rgba(5, 4, 12, 0.85), rgba(5, 4, 12, 0) 100%);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    min-height: 3.6em;
 }
 
-.show-actions {
+.tier-item__remove {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    z-index: 2;
     display: flex;
-    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    background: rgba(5, 4, 12, 0.65);
+    border: 1px solid rgba(239, 68, 68, 0.6);
+    color: var(--danger-strong);
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s var(--ease), background-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.tier-item:hover .tier-item__remove,
+.tier-item:focus-within .tier-item__remove {
+    opacity: 1;
+}
+
+.tier-item__remove:hover {
+    background: var(--danger);
+    color: #fff;
+}
+
+.tier-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s2);
+    padding: var(--s3);
+    background: none;
+    border: 2px dashed var(--border);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.tier-add:hover {
+    border-color: var(--accent);
+    color: var(--accent-strong);
+}
+
+.tray {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    gap: var(--s3);
+    max-height: 46vh;
+    overflow-y: auto;
+    padding-top: var(--s4);
+    border-top: 1px solid var(--border-soft);
+}
+
+.tray__bar {
+    display: flex;
+    align-items: center;
     flex-wrap: wrap;
+    gap: var(--s3);
+}
+
+.tray__bar .search--inline {
+    flex: 1;
+    min-width: 180px;
+    margin-bottom: 0;
+}
+
+.tray__items {
+    display: flex;
+    flex-wrap: nowrap;
+    align-content: flex-start;
+    gap: var(--s2);
+    min-height: 76px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: var(--s3);
+    background: var(--panel-glass);
+    border: 1px dashed var(--border-soft);
+}
+
+.tray__items.is-over {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: var(--accent);
+}
+
+/* ============================================================
+   SELECTION MODAL (tier maker "create/edit selection")
+   ============================================================ */
+.sel-modal {
+    width: 640px;
+    max-width: 92vw;
+    height: 640px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#selSearchWrap {
+    margin-bottom: var(--s2);
+}
+
+.sel-paste-modal {
+    width: 480px;
+    max-width: 92vw;
+}
+
+.sel-paste-modal textarea {
+    width: 100%;
+    font-family: var(--font-mono);
+}
+
+.tag-chip__x {
+    margin-left: 6px;
+    opacity: 0.7;
+}
+
+.tag-chip__x:hover {
+    opacity: 1;
+}
+
+.tag-suggest {
+    --n: 6px;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    max-height: 220px;
+    overflow-y: auto;
+    background: rgba(13, 10, 26, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+.input-suggest-wrap {
+    position: relative;
+}
+
+/* A suggestion dropdown inside a modal is positioned absolute against
+   its input, but the modal box itself clips anything past its own
+   (auto-height) bounds — the dropdown doesn't count toward that height
+   since it's out of flow, so it got sliced off. Lift the clip only
+   while a dropdown is actually open. */
+.modal-container__inner:has(.tag-suggest:not([hidden])) {
+    overflow: visible;
+}
+
+.tag-suggest__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s2);
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    background: none;
+    border: 0;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.tag-suggest__item:hover {
+    background: rgba(168, 85, 247, 0.16);
+    color: var(--accent-strong);
+}
+
+.tag-suggest__hint {
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+.tag-suggest__empty {
+    padding: 8px 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+}
+
+.sel-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    margin-bottom: var(--s4);
+}
+
+.sel-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: var(--s4);
+}
+
+.sel-section__label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+.sel-section__action {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    cursor: pointer;
+}
+
+.sel-section__action:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+}
+
+.sel-list {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--s2);
+    height: 160px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: var(--s2);
+    background: var(--panel-glass);
+    border: 1px solid var(--border-soft);
+}
+
+.sel-row {
+    position: relative;
+    width: 90px;
+    flex-shrink: 0;
+}
+
+.sel-row input[type="checkbox"] {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 2;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+}
+
+.sel-row.is-checked {
+    outline: 3px solid var(--accent);
+    outline-offset: -3px;
+}
+
+/* ============================================================
+   COVER CARD
+   Shared poster component behind About me, My top lists and the
+   ref-modal detail panel. A cover with a hover-reveal action row and a
+   bottom-gradient caption.
+   ============================================================ */
+.cover-card {
+    --card-accent: var(--accent);
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: var(--panel-2);
+    background-image: var(--bg-image, none);
+    background-size: cover;
+    background-position: center top;
+}
+
+/* Hover/focus/tilt rules for .cover-card live with the shared .show-frame
+   tilt rules near line 843. */
+
+.cover-card__actions {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 3;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s var(--ease);
+}
+
+.cover-card:hover .cover-card__actions,
+.cover-card:focus-within .cover-card__actions {
+    opacity: 1;
+}
+
+.cover-card__empty {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-align: center;
+    padding: var(--s3);
+}
+
+/* The one game's full-bleed cover. */
+.cover-slice {
+    position: absolute;
+    inset: 0;
+    background-color: var(--panel-2);
+    background-image: var(--bg-image, none);
+    background-size: cover;
+    background-position: center top;
+}
+
+.cover-card__foot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    /* Taller, stronger fade than before — with a title, subtitle and
+       description all possibly stacked here, a weak fade left the text
+       sitting on bare cover art instead of a dark backdrop. Eased
+       falloff (not a straight line): opaque at the bottom, still 65% a
+       third of the way up and 45% at halfway, holding dark for longer
+       before thinning out near the top. */
+    padding: 84px 9px 9px;
+    background: linear-gradient(to top,
+        rgba(5, 4, 12, 1) 0%,
+        rgba(5, 4, 12, 0.65) 33%,
+        rgba(5, 4, 12, 0.45) 50%,
+        rgba(5, 4, 12, 0.15) 75%,
+        rgba(5, 4, 12, 0) 100%);
+}
+
+/* No truncation: a multi-word title just wraps onto more lines: a
+   single word too long to fit (no space to wrap at) shrinks instead —
+   see fitTitles() in script-about.js. overflow-wrap is only a safety
+   net for the rare word that's still too wide at the smallest size. */
+.cover-card__name {
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-primary);
+    /* Crisp pixel-style offset plus a soft blur behind it — the hard
+       shadow alone read fine over the gradient's darkest part but got
+       lost once a bright cover showed through higher up the fade. */
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.85);
+    overflow-wrap: anywhere;
+}
+
+.cover-card__sub {
+    margin-top: 3px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--accent-strong);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.85);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cover-card__note {
+    margin-top: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ============================================================
+   ABOUT ME
+   A wall of large, fixed-size vertical cover cards. The topic label
+   sits above the card in its own small box, and the grid just scrolls
+   down as more cards are added instead of shrinking them to fit.
+   ============================================================ */
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: var(--s5);
+    align-items: start;
+}
+
+.about-cell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.about-cell__label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 30px;
+    box-sizing: border-box;
+    padding: 0 9px;
+    background: rgba(139, 92, 246, 0.16);
+    border: 1px solid var(--border-soft, var(--border));
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    /* Pixel fonts tend to render taller than their own line-height metric
+       claims — "normal" here was tight enough that overflow:hidden on the
+       text below was clipping the tops/bottoms of glyphs, not just excess
+       width. A looser line-height gives the glyphs actual room. */
+    line-height: 1.6;
+    color: var(--accent-strong);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6);
+    text-align: center;
+    cursor: grab;
+}
+
+.about-cell__label-text {
+    /* Topics like "Favorite Game of all Time" don't fit a 170px chip on
+       one line — rather than wrapping to a second line (which staggers
+       every card below it out of grid alignment), fitLabels() in
+       script-about.js shrinks the font-size per label until it fits.
+       The box itself is a fixed-size rectangle (width and height) so
+       cards never shift position; only the text inside scales down and
+       stays centered horizontally. No vertical overflow:hidden here —
+       see the line-height note above for why that was clipping text.
+       fitLabel's shrink loop only measures scrollWidth, so it works the
+       same with or without it. */
+    max-width: 100%;
+    white-space: nowrap;
+    /* overflow-x alone would compute overflow-y to auto (not visible) per
+       spec, silently clipping vertically again — both need to be explicit. */
+    overflow-x: hidden;
+    overflow-y: visible;
+}
+
+/* Overlaid rather than laid out inline, so it doesn't nudge the
+   centered text sideways at rest — it only appears on hover/focus. */
+.about-cell__label-edit {
+    position: absolute;
+    right: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    padding: 3px;
+    background: rgba(5, 4, 12, 0.75);
+    border: 1px solid var(--border-soft, var(--border));
+    color: var(--text-primary);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.12s var(--ease);
+}
+
+.about-cell__label-edit .icon {
+    width: 11px;
+    height: 11px;
+}
+
+.about-cell__label:hover .about-cell__label-edit,
+.about-cell__label-edit:focus-visible {
+    opacity: 1;
+}
+
+.about-cell__label.is-dragging {
+    opacity: 0.4;
+}
+
+/* Marks exactly where a dragged card will land — same idea as the tier
+   maker's .tier-drop-indicator, but anchored to the target card (a
+   sibling landing alone in its own grid row, the common case at
+   narrow/single-column widths, would have no row height to stretch
+   against) instead of inserted as a grid item between two cards. */
+.about-drop-indicator {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 2px;
+    background: var(--accent-strong);
+    box-shadow: 0 0 8px var(--accent-strong);
+    pointer-events: none;
+}
+
+.about-drop-indicator.is-before {
+    left: -7px;
+}
+
+.about-drop-indicator.is-after {
+    right: -7px;
+}
+
+.about-card {
+    aspect-ratio: 9 / 16;
+}
+
+/* Empty slot: same dashed-prompt treatment as an unfilled top-list rank
+   (.top-row--empty) instead of a solid filled panel. */
+.about-card:has(.cover-card__empty) {
+    background-color: transparent;
+    border: 2px dashed var(--border-soft, var(--border));
+}
+
+.about-card:has(.cover-card__empty):hover {
+    border-color: var(--accent-strong);
+}
+
+.about-card .cover-card__empty {
+    color: var(--text-dim);
+}
+
+.about-card:hover .cover-card__empty {
+    color: var(--accent-strong);
+}
+
+.about-cell.is-flash .about-card {
+    animation: about-flash 1.2s var(--ease);
+}
+
+@keyframes about-flash {
+    0%, 100% { box-shadow: none; }
+    25%, 75% { box-shadow: 0 0 0 3px var(--accent-strong); }
+}
+
+/* ============================================================
+   REF MODAL
+   Shared detail panel for a single game reference — used by About me
+   and My top lists. Unlike the earlier version of this component, the
+   outer box (.ref-modal) keeps the ordinary .modal-container/.notch
+   chrome — same border + clipped corners as every other dialog in the
+   app — instead of trying to draw it on the inner panel. Cover and
+   panel are plain flex siblings: `align-items: stretch` makes the
+   cover match the panel's full height, and `aspect-ratio` derives its
+   width from that so it's never stretched out of proportion or cropped.
+   ============================================================ */
+.ref-modal {
+    /* A plain `border` can't follow the .notch clip-path through the cut
+       corners (see NOTCHED SHAPES above) — it renders square-cornered
+       and gets sliced off wherever the octagon cuts in, leaving broken
+       corners. Same two-stacked-shape fix as .notch-frame/.notch-inner:
+       this element is the border-coloured frame, .ref-modal__inner is
+       inset by --bw with its own, proportionally smaller clip-path. */
+    --bw: 3px;
+    width: min(760px, 94vw);
+    max-width: none;
+    /* A flex row can only stretch a sibling to match an auto-height
+       container if that height is definite — with auto height (sized
+       by content) the cover/panel height is circular and browsers just
+       give the cover 0 width. A fixed height breaks the cycle; the
+       panel still scrolls its own overflow past it. */
+    height: min(560px, 88vh);
+    padding: var(--bw);
+    border: 0;
+    /* Translucent, not solid — an opaque frame here would sit directly
+       behind .ref-modal__inner and become the only thing its
+       backdrop-filter has to blur, tinting the whole panel with a flat
+       wash of --border instead of the real page. Blurring the page here
+       first, then darkening it further in .ref-modal__inner, is what
+       keeps the panel reading dark-and-see-through instead of a solid
+       light-purple slab. */
+    background: color-mix(in srgb, var(--border) 35%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.ref-modal__inner {
+    display: flex;
+    align-items: stretch;
+    gap: var(--s5);
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* Padding all round keeps the cover and the panel's text/buttons off
+       the modal's own edges — without it the cover stretches edge-to-
+       edge (reading as an overflow) and the panel's content butts
+       straight up against the right/top/bottom border. */
+    padding: var(--s5);
+    background: rgba(5, 4, 12, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* Color swatch and close button share one row, top-right of the whole
+   modal — the swatch used to sit inline with the title text lower down,
+   which put it right underneath the close X with nothing to tie the two
+   together. */
+.ref-modal__icon-row {
+    position: absolute;
+    top: var(--s3);
+    right: var(--s3);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+}
+
+.ref-modal__icon-row .icon-btn {
+    background: rgba(5, 4, 12, 0.55);
+}
+
+.ref-modal__icon-row .detail-color-swatch {
+    width: 28px;
+    height: 28px;
+}
+
+.ref-modal__stage {
+    position: relative;
+    flex: 0 1 auto;
+    align-self: stretch;
+    aspect-ratio: 3 / 4;
+    /* No max-width here — capping it fights the aspect-ratio (the box
+       ends up narrower than 3:4 relative to its stretched height,
+       which is what let the cover's background-size:contain
+       letterbox). The box's own fixed height already keeps this a
+       sane size. */
+}
+
+.ref-modal__cover {
+    position: absolute;
+    inset: 0;
+    background-color: var(--panel-2);
+    background-image: var(--bg-image, none);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    box-shadow: 8px 10px 0 rgba(0, 0, 0, 0.55);
+}
+
+.ref-modal__panel {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* The panel's fixed-height box (unlike an auto-height modal-container)
+   leaves dead space below whatever content it holds — pin the save/
+   delete row to the bottom instead of letting it float under the form
+   with a blank gap beneath. */
+.ref-modal__panel .form-buttons {
+    margin-top: auto;
+}
+
+.ref-modal__pager {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    align-self: flex-start;
+    padding: 3px 8px 3px 3px;
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid var(--border-soft, var(--border));
+}
+
+.ref-modal__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+}
+
+/* Also the editable title field now — an <input>, not a <p>, so it can
+   be relabeled without going through "Change game" below it. Reset to
+   plain-text-looking chrome (no border/background of its own beyond the
+   shared underline) so it still reads as a heading, not a form field. */
+.ref-modal__title {
+    display: block;
+    width: 100%;
+    font-family: var(--font-pixel);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--accent-strong);
+    padding: 0 0 var(--s3);
+    border: none;
+    border-bottom: 1px solid var(--border-soft, var(--border));
+    background: none;
+    outline: none;
+}
+
+.ref-modal__title:disabled {
+    color: var(--text-dim);
+    cursor: default;
+}
+
+.ref-modal__title::placeholder {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: none;
+    color: var(--text-dim);
+}
+
+/* Anchored off the icon row up top (fixed offsets, same containing
+   block as .ref-modal__icon-row) rather than off the swatch button
+   itself, so it doesn't need its own positioned wrapper. */
+#aboutModalColorPopup {
+    top: calc(var(--s3) + 28px + var(--s2) + 6px);
+    right: var(--s3);
+}
+
+/* "Change game" and "View in library" — even columns when both show,
+   full width when only one does, instead of each sizing to its own
+   label and leaving a ragged gap on one side. */
+.ref-modal__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+}
+
+.ref-modal__row .btn-notch {
+    flex: 1 1 0;
+}
+
+/* These sit in the narrower ref-modal panel, next to whole-sentence
+   labels ("Manage games (tie up to 3)") — worth wrapping onto a second
+   line rather than fighting the panel width for one long line. */
+.ref-modal__row .btn-notch__inner {
+    white-space: normal;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .ref-modal {
+        width: min(360px, 92vw);
+        /* A bit taller and the cover a bit shorter (below) than before —
+           with the title, topic, subtitle, color row and description all
+           stacked in the same panel, the old 200px cover left barely any
+           of the fixed-height box for the form itself. */
+        height: min(620px, 92vh);
+    }
+
+    .ref-modal__inner {
+        flex-direction: column;
+        gap: var(--s3);
+    }
+
+    /* Stacked above the panel now, so it gets a fixed height of its own
+       (width auto via aspect-ratio) instead of stretching to match —
+       stretching would eat most of the box's limited height. */
+    .ref-modal__stage {
+        flex: 0 0 auto;
+        align-self: center;
+        max-width: none;
+        width: auto;
+        height: 130px;
+    }
+
+    .ref-modal__panel {
+        gap: var(--s2);
+    }
+}
+
+.show__topleft {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.popover--awards {
+    min-width: 220px;
+    max-width: 280px;
+    /* Also opened from the detail modal's icon row now, which sits at
+       z-index 101 — above the base popover z-index (6), so it'd render
+       invisibly behind it without its own bump. */
+    z-index: 210;
+}
+
+.awards-section__label {
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+.awards-section__label:first-child {
+    margin-top: 0;
+}
+
+.awards-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 4px;
+    background: none;
+    border: 0;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.awards-row:hover {
+    background: rgba(139, 92, 246, 0.16);
+    color: var(--text-primary);
+}
+
+.awards-row__label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.awards-row__chip {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    padding: 1px 5px;
+    background: var(--tier, var(--accent));
+    color: #16091f;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+}
+
+.awards-row__rank {
+    flex-shrink: 0;
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    color: var(--accent-strong);
+}
+
+/* ============================================================
+   MY TOP LISTS
+   Each rank is a horizontal row: the cover overflows the box on the
+   left (and tilts toward the cursor, like a leaned-out poster), a big
+   ghost rank number anchors the right edge, and the row's own faded
+   cover art sits behind the title/description as a backdrop. Drag to
+   reorder, or use the up/down/remove buttons that appear on hover.
+   ============================================================ */
+.top-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    white-space: nowrap;
+}
+
+.top-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    padding: 18px 6px 8px 26px;
+}
+
+.top-row {
+    --card-accent: var(--accent);
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 168px;
+    /* Left padding is cover width + gap to the title — shrunk the gap so
+       the title sits right up against the cover instead of floating in
+       the middle of the row. */
+    padding: var(--s4) 64px var(--s4) calc(150px + 18px);
+    cursor: grab;
+    background-color: var(--panel-2);
+    border: 2px solid transparent;
+    isolation: isolate;
+    transition: border-color 0.15s var(--ease), transform 0.15s var(--ease);
+}
+
+/* A dedicated, overflow-hidden layer for the faded backdrop — kept
+   separate from .top-row itself, which stays overflow-visible so the
+   covers can still poke out past the row's edge. The screenshot itself
+   (not the cover art) fades to fully transparent left-to-right via a
+   mask, revealing the row's own panel color — no blur, just fade. */
+.top-row__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background-color: var(--panel-2);
+}
+
+.top-row__bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--bg-image, none);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.6;
+    mask-image: linear-gradient(to right, black 0%, black 32%, transparent 88%);
+    -webkit-mask-image: linear-gradient(to right, black 0%, black 32%, transparent 88%);
+}
+
+.top-row:active {
+    cursor: grabbing;
+}
+
+.top-row.is-dragging {
+    opacity: 0.35;
+}
+
+.top-row.is-over {
+    border-color: var(--accent-strong);
+}
+
+.top-row.is-gold {
+    --card-accent: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 40px -6px var(--gold);
+}
+
+.top-row.is-silver {
+    --card-accent: #cbd5e1;
+    border-color: #cbd5e1;
+    box-shadow: 0 0 18px -8px #cbd5e1;
+}
+
+.top-row.is-bronze {
+    --card-accent: #d97757;
+    border-color: #d97757;
+    box-shadow: 0 0 18px -8px #d97757;
+}
+
+/* ---- An unfilled rank: still its own row (every position from 1 to
+   the list's size exists from the start), just a dashed prompt instead
+   of cover art. ---- */
+.top-row--empty {
+    justify-content: center;
+    min-height: 72px;
+    padding: var(--s4) 64px;
+    background: none;
+    border: 2px dashed var(--border-soft, var(--border));
+    cursor: pointer;
+}
+
+/* .top-row's own --card-accent (a plain default, unrelated to rankColor)
+   would otherwise tint an empty rank's ghost number purple too — only a
+   filled row past #3 should pick up the title's color. */
+.top-row--empty .top-row__rank {
+    color: var(--text-dim);
+    opacity: 0.4;
+}
+
+.top-row__empty-fill {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    background: none;
+    border: 0;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.top-row--empty:hover {
+    border-color: var(--accent-strong);
+}
+
+.top-row--empty:hover .top-row__empty-fill {
+    color: var(--accent-strong);
+}
+
+/* ---- Cover: overflows the row on the left and top/bottom, tilts on
+   hover. The box itself is 3:4 — the same ratio as the cover art — so
+   there's no letterboxing. A plain fixed `top` offset (width + aspect-
+   ratio only) rather than top/bottom + auto-margin centering: with
+   both top and bottom pinned, browsers resolve the box to fit exactly
+   between them instead of respecting aspect-ratio, which is what was
+   shrinking it back down. ---- */
+.top-row__cover {
+    position: absolute;
+    left: -26px;
+    top: -16px;
+    z-index: 2;
+    width: 150px;
+    aspect-ratio: 3 / 4;
+    background-color: var(--panel);
+    background-image: var(--bg-image, none);
+    background-size: cover;
+    background-position: center;
+    border: 2px solid var(--border);
+    box-shadow: 6px 8px 0 rgba(0, 0, 0, 0.55);
+}
+
+.top-row__cover.is-tilting {
+    transition: transform 0.12s ease-out, box-shadow 0.2s var(--ease);
+    box-shadow: 10px 14px 0 rgba(0, 0, 0, 0.6);
+}
+
+.top-row.is-gold .top-row__cover {
+    border-color: var(--gold);
+    box-shadow: 0 0 32px -2px var(--gold), 6px 8px 0 rgba(0, 0, 0, 0.55);
+}
+
+.top-row.is-silver .top-row__cover {
+    border-color: #cbd5e1;
+    box-shadow: 0 0 14px -4px #cbd5e1, 6px 8px 0 rgba(0, 0, 0, 0.55);
+}
+
+.top-row.is-bronze .top-row__cover {
+    border-color: #d97757;
+    box-shadow: 0 0 14px -4px #d97757, 6px 8px 0 rgba(0, 0, 0, 0.55);
+}
+
+/* ---- Body copy ---- */
+.top-row__body {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    /* Was vertically centered with everything else in the row (.top-row
+       has align-items: center) — pinned to the top instead so the title
+       sits top-left of the card rather than mid-height. */
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.top-row__title {
+    font-family: var(--font-pixel);
+    font-size: 20px;
+    line-height: 1.3;
+    color: var(--card-accent);
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
+    /* Wraps instead of ellipsis-truncating — .top-row only has a
+       min-height, so a longer title just grows the row a bit. */
+    overflow-wrap: break-word;
+}
+
+.top-row__meta {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.top-row__meta::before {
+    content: "> ";
+    color: var(--card-accent);
+}
+
+/* Its own column on the right of the row instead of a line squeezed
+   into the body — "why it placed here" reads at a glance without
+   opening the editor. Font-size stays fixed (no shrinking) — capped at
+   5 lines' worth of height, anything past that scrolls (overflow-y)
+   instead of shrinking to fit or getting silently cut off. */
+.top-row__note {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    align-self: center;
+    max-width: 58%;
+    max-height: calc(1.3em * 5);
+    margin-left: var(--s3);
+    padding-right: 30px;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-style: italic;
+    line-height: 1.3;
+    color: var(--accent-strong);
+    text-align: right;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* ---- Ghost rank number ---- */
+.top-row__rank {
+    position: absolute;
+    right: var(--s4);
+    top: 50%;
+    z-index: 1;
+    transform: translateY(-50%);
+    font-family: var(--font-pixel);
+    font-size: 34px;
+    line-height: 1;
+    /* Same --card-accent the title already uses — ranks 4+ get their
+       purple-gradient fade here too now, instead of staying plain gray. */
+    color: var(--card-accent);
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.top-row.is-gold .top-row__rank {
+    color: var(--gold);
+    opacity: 0.9;
+    text-shadow: 0 0 22px rgba(251, 191, 36, 0.75);
+}
+
+.top-row.is-silver .top-row__rank {
+    color: #cbd5e1;
+    opacity: 0.8;
+    text-shadow: 0 0 12px rgba(203, 213, 225, 0.5);
+}
+
+.top-row.is-bronze .top-row__rank {
+    color: #d97757;
+    text-shadow: 0 0 12px rgba(217, 119, 87, 0.5);
+    opacity: 0.75;
+}
+
+/* ============================================================
+   INLINE SEARCH FIELD (tray bar, selection modal)
+   ============================================================ */
+.search--inline {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--s4);
+}
+
+.search--inline .search__icon {
+    position: absolute;
+    left: 11px;
+    width: 14px;
+    height: 14px;
+    color: var(--text-dim);
+    pointer-events: none;
+}
+
+.search--inline input {
+    width: 100%;
+    padding: 9px 12px 9px 34px;
+    border: 2px solid var(--border);
+    border-radius: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-term);
+    font-size: 16px;
+}
+
+.search--inline input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* ============================================================
+   RESPONSIVE
+   Below 980px the sidebar stops being a fixed column and rides
+   along at the top; below 620px the remaining two-up rows stack.
+   ============================================================ */
+@media (max-width: 980px) {
+    html,
+    body {
+        /* height:auto lets the page grow past the viewport for its
+           content (cards, sidebar drawer) instead of clipping it the
+           way the desktop layout's height:100%/overflow:hidden does.
+           But percentage backgrounds only paint the box's own height —
+           on a viewport taller than the content (any non-16:9 screen)
+           that left everything below the last card uncovered, showing
+           raw white instead of the gradient. min-height:100vh keeps the
+           box at least viewport-tall so the background always reaches
+           the bottom, whichever is taller. */
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .app {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .mobile-topbar {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        padding: var(--s3) var(--s4);
+        background: var(--panel-glass);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid var(--border-soft);
+    }
+
+    .mobile-topbar__logo {
+        width: 24px;
+        height: 24px;
+        image-rendering: pixelated;
+    }
+
+    .mobile-topbar__name {
+        font-family: var(--font-pixel);
+        font-size: 12px;
+        color: var(--accent-strong);
+        text-shadow: 2px 2px 0 var(--accent-hover);
+    }
+
+    .sidebar__backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        background: rgba(5, 4, 12, 0.72);
+    }
+
+    .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 60;
+        width: min(300px, 86vw);
+        transform: translateX(-100%);
+        transition: transform 0.25s var(--ease);
+        overflow-y: auto;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar.is-open {
+        transform: translateX(0);
+    }
+
+    .sidebar__close {
+        display: flex;
+        margin-left: auto;
+    }
+
+    .sidebar__scroll {
+        overflow: visible;
+        flex-shrink: 0;
+    }
+
+    .main__scroll {
+        overflow: visible;
+        mask-image: none;
+        -webkit-mask-image: none;
+    }
+
+    .shows {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: var(--s4);
+    }
+
+    .detail-hero {
+        padding: 96px var(--s4) var(--s3);
+        gap: var(--s4);
+    }
+
+    .detail-body,
+    .detail-related {
+        padding-left: var(--s4);
+        padding-right: var(--s4);
+    }
+
+    /* The panel is fetched/rendered with room for a full desktop row
+       (see RELATED_LIMIT in script-detail.js); the narrower mobile
+       layout only has space for 3 across, so the rest stay in the DOM
+       but hidden rather than needing a separate mobile-only fetch. */
+    .detail-related-list .related-card:nth-child(n + 4) {
+        display: none;
+    }
+
+    .view--scroll {
+        overflow: visible;
+    }
+}
+
+@media (max-width: 620px) {
+    .toolbar {
+        flex-wrap: wrap;
+    }
+
+    .search {
+        max-width: none;
+        flex-basis: 100%;
+    }
+
+    .detail-cover {
+        width: 88px;
+        height: 122px;
+    }
+
+    .detail-title {
+        font-size: 15px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tier {
+        grid-template-columns: 56px 1fr 26px;
+    }
+
+    .tier__label {
+        font-size: 11px;
+    }
+
+    .tray__bar {
+        flex-wrap: wrap;
+    }
+
+    /* ---- Compact library cards: 2 per row instead of 1 ----
+       The card is already a tall poster (aspect-ratio 9/16), so halving
+       its width just makes a smaller poster — the description is the
+       only thing dropped, and only the first couple of rating aspects
+       stay visible since a 5-row bar list no longer fits. */
+    .shows {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--s3);
+    }
+
+    .show {
+        padding: var(--s3);
+    }
+
+    .show-title {
+        font-size: 10px;
+        margin-bottom: 3px;
+    }
+
+    .show-year {
+        font-size: 9px;
+        margin-bottom: var(--s2);
+    }
+
+    .show-description {
+        display: none;
+    }
+
+    .show-info .aspect-bars {
+        gap: 3px;
+    }
+
+    .show-info .aspect-bar-head {
+        gap: 4px;
+    }
+
+    .show-info .aspect-bar:nth-child(n + 4) {
+        display: none;
+    }
+
+    .show-info .aspect-bar-label {
+        font-size: 7px;
+    }
+
+    .show-info .aspect-bar-track {
+        height: 6px;
+        gap: 2px;
+    }
+
+    .aspect-bar-value {
+        font-size: 8px;
+    }
+
+    .rating-seal {
+        min-width: 26px;
+        height: 18px;
+        padding: 0 5px;
+        font-size: 10px;
+    }
+
+    .favorite-badge,
+    .removeXBtn {
+        width: 18px;
+        height: 18px;
+    }
+
+    .favorite-badge .pixel-star {
+        width: 10px;
+        height: 10px;
+    }
+
+    .toggleWatchedBtn .btn-notch__inner {
+        padding: 6px 4px;
+        font-size: 8px;
+    }
+
+    /* ---- Compact top-list rows ---- */
+    .top-rows {
+        gap: 36px;
+        padding-left: 18px;
+    }
+
+    .top-row {
+        min-height: 120px;
+        padding: var(--s3) 40px var(--s3) calc(80px + 30px);
+    }
+
+    .top-row__cover {
+        left: -18px;
+        width: 80px;
+    }
+
+    .top-row__title {
+        font-size: 18px;
+    }
+
+    .top-row__meta {
+        font-size: 11px;
+    }
+
+    .top-row__rank {
+        right: var(--s3);
+        font-size: 24px;
+    }
+}
+
+/* ============================================================
+   EXPORT POSTER
+   Off-screen frame used only by script-export.js: the real view markup
+   (top rows / tier board / about cells) gets appended inside it, so it
+   inherits all of that markup's own styling untouched — this just adds
+   the branded header/footer and the captured pixel-field backdrop.
+   ============================================================ */
+.export-poster {
+    position: relative;
+    width: 100%;
+    padding: 48px;
+    background-color: var(--bg-deep);
+    background-size: cover;
+    background-position: center;
+    font-family: var(--font-term);
+}
+
+.export-poster::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(760px 420px at 50% 0%, rgba(139, 92, 246, 0.22), transparent 60%),
+        rgba(5, 4, 12, 0.55);
+}
+
+.export-poster > * {
     position: relative;
     z-index: 1;
 }
 
-.toggleWatchedBtn,
-.editBtn,
-.deleteBtn {
-    flex: 1;
-    padding: 8px 6px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    min-width: 90px;
-    white-space: nowrap;
+.export-poster__head {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin-bottom: 36px;
 }
 
-.toggleWatchedBtn {
-    color: white;
-    transition: all 0.3s ease;
+.export-poster__logo {
+    width: 44px;
+    height: 44px;
+    image-rendering: pixelated;
 }
 
-.toggleWatchedBtn:hover {
-    transform: translateY(-2px) scale(1.01);
+.export-poster__title {
+    font-family: var(--font-pixel);
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--accent-strong);
+    text-shadow: 2px 2px 0 var(--accent-hover);
 }
 
-.editBtn {
-    background: linear-gradient(140deg, var(--accent-purple), var(--accent-violet));
-    color: white;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 22px rgba(168, 85, 247, 0.28);
+.export-poster__subtitle {
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
 }
 
-.editBtn:hover {
-    background: linear-gradient(140deg, var(--hover-purple), var(--hover-violet));
-    transform: translateY(-2px) scale(1.01);
-    box-shadow: 0 10px 26px rgba(168, 85, 247, 0.35);
-}
-
-.deleteBtn {
-    background: linear-gradient(140deg, #f87171, var(--accent-red));
-    color: white;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 22px rgba(239, 68, 68, 0.28);
-}
-
-.deleteBtn:hover {
-    background: linear-gradient(140deg, #ef4444, #dc2626);
-    transform: translateY(-2px) scale(1.01);
-    box-shadow: 0 10px 26px rgba(239, 68, 68, 0.35);
+.export-poster__foot {
+    margin-top: 36px;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
 }
