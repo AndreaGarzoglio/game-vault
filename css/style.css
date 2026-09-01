@@ -3364,8 +3364,11 @@ input.aspect-input[type="number"]:focus {
     min-height: 168px;
     /* Left padding is cover width + gap to the title — shrunk the gap so
        the title sits right up against the cover instead of floating in
-       the middle of the row. */
-    padding: var(--s4) 64px var(--s4) calc(150px + 18px);
+       the middle of the row. Right padding reserves room for the ghost
+       rank number: at 34px/digit, 64px only cleared a single digit —
+       double digits (10+) spilled left into the note's own box, landing
+       under its scrollbar. */
+    padding: var(--s4) 96px var(--s4) calc(150px + 18px);
     cursor: grab;
     background-color: var(--panel-2);
     border: 2px solid transparent;
@@ -3929,7 +3932,7 @@ input.aspect-input[type="number"]:focus {
 
     .top-row {
         min-height: 120px;
-        padding: var(--s3) 40px var(--s3) calc(80px + 30px);
+        padding: var(--s3) 40px var(--s3) calc(80px + 18px);
     }
 
     .top-row__cover {
