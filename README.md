@@ -51,11 +51,24 @@ Local persistence via `localStorage` (the small backend only keeps the IGDB cred
 
 ## Project structure
 
-| File | Role |
+```
+game-vault/
+├── index.html          Page markup: shell, sidebar, all view containers
+├── favicon.svg          App icon, reused as the sidebar logo
+├── server.js            Local dev server (static files + /api/igdb proxy)
+├── package.json
+├── css/
+│   └── style.css        Visual theme (purple pixel-art palette, notch shapes, responsive layout)
+├── js/                   All frontend logic, loaded as plain <script> tags (no bundler)
+├── data/
+│   └── template-vault.js  Bundled starter library — seeds a first visit and "Reset to template"
+├── imgs/                 Static image assets
+└── api/
+    └── igdb.js            Same proxy as server.js, as a Vercel serverless function
+```
+
+| File in `js/` | Role |
 |---|---|
-| `index.html` | Page markup: shell, sidebar, all view containers |
-| `style.css` | Visual theme (purple pixel-art palette, notch shapes, responsive layout) |
-| `template-vault.js` | Bundled starter library — seeds a first visit and "Reset to template" |
 | `script-ui.js` | Shared UI kit: escaping, dialogs, confirm/toast, icons, view switching |
 | `script-store.js` | `localStorage` read/write, vault keys, export/import, clear/reset |
 | `script.js` | Library core: data model, CRUD, grid rendering, bulk add, awards tracking |
@@ -73,8 +86,6 @@ Local persistence via `localStorage` (the small backend only keeps the IGDB cred
 | `script-export.js` | Export a board/list as a PNG (html2canvas) |
 | `script-fx.js` | Shared visual effects: animated pixel field, cursor-tilt on covers |
 | `script-background.js` | Ambient background wiring for the pixel field |
-| `server.js` | Local dev server: serves the static files and proxies `/api/igdb` to IGDB with the Twitch app token attached server-side |
-| `api/igdb.js` | Same proxy, as a Vercel serverless function for deployment |
 
 ## Deploying
 
