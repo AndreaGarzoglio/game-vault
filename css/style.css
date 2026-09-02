@@ -4071,3 +4071,14 @@ input.aspect-input[type="number"]:focus {
     letter-spacing: 0.06em;
     color: var(--text-dim);
 }
+
+/* Top-list export: the note reads fine live but is just clutter in a
+   shareable image meant to be read at a glance — drop it and let the
+   title grow into the freed-up space instead. */
+.export-poster .top-row__note {
+    display: none;
+}
+
+.export-poster .top-row__title {
+    font-size: 30px;
+}
