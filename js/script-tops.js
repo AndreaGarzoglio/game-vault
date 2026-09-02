@@ -443,6 +443,10 @@
         const rowsEl = document.createElement('div');
         rowsEl.className = 'top-rows';
         rowsEl.innerHTML = filled.map((x) => rowMarkup(x.slot, x.index)).join('');
+        // The live backdrop's fade relies on mask-image, which html2canvas
+        // renders unreliably (a stray bar of solid panel color instead of a
+        // smooth fade) — swap in the gradient-based fallback for export only.
+        rowsEl.querySelectorAll('.top-row__bg').forEach((el) => el.classList.add('top-row__bg--export'));
 
         await window.exportNodeAsPoster({
             innerNode: rowsEl,

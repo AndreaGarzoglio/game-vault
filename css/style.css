@@ -3401,6 +3401,27 @@ input.aspect-input[type="number"]:focus {
     -webkit-mask-image: linear-gradient(to right, black 0%, black 32%, transparent 88%);
 }
 
+/* html2canvas (used for the "save as image" export) doesn't support
+   mask-image reliably — the ::before above renders with a stray hairline
+   of the raw panel color at the mask's edges instead of a smooth fade,
+   which reads as a "raised" screenshot with a colored bar cut into it.
+   The export markup (script-tops.js) swaps in this class instead: same
+   fade, baked into a real background-image gradient rather than a mask,
+   which html2canvas renders correctly. rgba(36, 29, 64, *) is
+   var(--panel-2) spelled out — gradients can't reference a custom
+   property's channels directly. */
+.top-row__bg--export {
+    background-image:
+        linear-gradient(to right, rgba(36, 29, 64, 0.4) 0%, rgba(36, 29, 64, 0.4) 32%, rgba(36, 29, 64, 1) 88%),
+        var(--bg-image, none);
+    background-size: cover;
+    background-position: center;
+}
+
+.top-row__bg--export::before {
+    content: none;
+}
+
 .top-row:active {
     cursor: grabbing;
 }
