@@ -2183,6 +2183,27 @@ input.aspect-input[type="number"]:focus {
     border-top: 1px solid var(--border-soft);
 }
 
+.sidebar__credits {
+    margin-top: var(--s3);
+    padding-top: var(--s3);
+    border-top: 1px solid var(--border-soft);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    line-height: 1.6;
+    text-align: center;
+    color: var(--text-dim);
+}
+
+.sidebar__credits a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.sidebar__credits a:hover {
+    color: var(--accent-strong);
+}
+
 /* ---- Save options: a single trigger tucked at the bottom of the
    sidebar opens export/import/reset/clear as a menu above it, rather
    than the four of them sitting always-expanded taking up sidebar
